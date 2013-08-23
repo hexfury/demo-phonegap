@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.userevents.demo-phonegap" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Employee Directory</name>
+    <description>
+        A simple employee directory application.
+    </description>
+    <author email="matthew.morgan@userevents.com" href="http://userevents.com">
+        Matthew C. Morgan
+    </author>
+    <access origin="*" />
+    <preference name="fullscreen" value="false" />
+    <preference name="webviewbounce" value="true" />
+    <feature name="http://api.phonegap.com/1.0/battery"/>
+    <feature name="http://api.phonegap.com/1.0/camera"/>
+    <feature name="http://api.phonegap.com/1.0/contacts"/>
+    <feature name="http://api.phonegap.com/1.0/file"/>
+    <feature name="http://api.phonegap.com/1.0/geolocation"/>
+    <feature name="http://api.phonegap.com/1.0/media"/>
+    <feature name="http://api.phonegap.com/1.0/network"/>
+    <feature name="http://api.phonegap.com/1.0/notification"/>
+    <preference name="com.urbanairship.development_app_key" value="Fjl3YpI-Q62YVB0jOyQH7w" />
+    <preference name="com.urbanairship.development_app_secret" value="8T4y4pIxTXaufcvPf5_5Xg" />
+    <preference name="com.urbanairship.in_production" value="False" />
+    <preference name="com.urbanairship.gcm_sender" value="390625689152" />
+</widget>
