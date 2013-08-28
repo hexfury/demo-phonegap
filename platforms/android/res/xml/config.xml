@@ -34,6 +34,8 @@
     <preference name="exit-on-suspend" value="false" />
     <preference name="fullscreen" value="false" />
     <preference name="webviewbounce" value="true" />
+    <preference name="com.urbanairship.production_app_key" value="Fjl3YpI-Q62YVB0jOyQH7w" />
+    <preference name="com.urbanairship.production_app_secret" value="8T4y4pIxTXaufcvPf5_5Xg" />
     <preference name="com.urbanairship.development_app_key" value="Fjl3YpI-Q62YVB0jOyQH7w" />
     <preference name="com.urbanairship.development_app_secret" value="8T4y4pIxTXaufcvPf5_5Xg" />
     <preference name="com.urbanairship.in_production" value="False" />

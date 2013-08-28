@@ -9,28 +9,56 @@ var app = {
         console.log("username: " + user);
         console.log("password: " + pass);
         console.log("Login Attempt - Submit Clicked");
+        window.localStorage.setItem("user", user);
+        window.localStorage.setItem("pass", pass);
         if(user != '' && pass != '') {
             console.log("attempting post to amazonaws");
-            var reqData = JSON.stringify({
-                    "user": user,
-                    "type": "login",
-                    "pass": pass,
-                    "origin": "demoApp"
-                });
-            console.log("data includes: " + reqData);
-            var request = $.ajax({ url: "/events/create", data: reqData, type: "POST", contentType: "application/json", dataType: "json", success: function(res) {
-                console.log(res.status);
-                console.log(res.statusText);
-                console.log(res.responseText);
-            }});
+            app.sendEvent("login");
             console.log("ajax fired...")
-            this.store = new LocalStorageStore()
+            this.store = new LocalStorageStore(function() {
+            this.page = new HomeView(this.store).render().el;
+            app.route(this.page);
+            });
         } else {
             console.log("sending to showAlert for failed login");
             app.showAlert("You must enter a username and password", "Failed Login");
             $("#submitButton").removeAttr("disabled");
         }
         return false;
+    },
+
+    sendEvent: function(type) {
+        var user = window.localStorage.getItem("user");
+        var pass = window.localStorage.getItem("pass");
+        var reqData = JSON.stringify({
+            "user": user,
+            "type": type,
+            "pass": pass,
+            "origin": "demoApp"
+        });
+        console.log("data json string includes: " + reqData);
+        var reqest = $.ajax({ url: "http://ec2-50-19-162-216.compute-1.amazonaws.com:8086/events/create", data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function(res) {
+            console.log(res.status);
+            console.log(res.statusText);
+            console.log(res.responseText);
+        }, fail: function() {
+            console.log("something didn't work");
+        }});
+        var reqest2 = $.ajax({ url: "/events/create", data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function(res) {
+            console.log(res.status);
+            console.log(res.statusText);
+            console.log(res.responseText);
+        }, fail: function() {
+            console.log("something didn't work");
+        }});
+        return false;
+    },
+
+    onPause: function() {
+        console.log("entered onPause function");
+        var user = window.localStorage.getItem("user");
+        var pass = window.localStorage.getItem("pass");
+        app.sendEvent("logout");
     },
 
     initialize: function() {
@@ -40,19 +68,19 @@ var app = {
         console.log("goto registerEvents");
         this.registerEvents();
         console.log("back from registerEvents");
-        this.homePage = new LoginView().render();
-        this.slidePage(this.homePage);
+        this.loginPage = new LoginView().render();
+        this.slidePage(this.loginPage);
+        $('#loginForm').submit(function() {
+            app.handleLogin();
+            return false;
+        });
     },
 
     registerEvents: function() {
         console.log("entered registerEvents function");
         var self = this;
-        $('#loginForm').submit(function(e) {
-            console.log("actually called the freaking bound function...");
-            app.handleLogin();
-            return false;
-        });
         $(window).on('hashchange', $.proxy(this.route, this));
+        document.addEventListener("pause", app.onPause, false);
         if (document.documentElement.hasOwnProperty('ontouchstart')) {
             $('body').on('touchstart', 'a', function(event) {
                 $(event.target).addClass('tappable-active');
@@ -76,12 +104,13 @@ var app = {
         var hash = window.location.hash;
         if (!hash) {
             console.log("entered route, not hash");
-            if (this.homePage) {
-                console.log("entered this.homepage");
+            if (this.loginPage) {
+                console.log("entered this.loginPage");
+                this.homePage = new HomeView(this.store).render();
                 this.slidePage(this.homePage);
             } else {
-                console.log("entered not this.homepage");
-                this.homePage = new LoginView(this.store).render();
+                console.log("entered not this.loginpage");
+                this.homePage = new HomeView(this.store).render();
                 this.slidePage(this.homePage);
             }
             return;
@@ -131,5 +160,3 @@ var app = {
         });
     }
 };
-
-app.initialize();
