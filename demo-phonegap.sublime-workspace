@@ -1,0 +1,319 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"onNOt",
+				"onNotificationGCM"
+			],
+			[
+				"Lo",
+				"loginPage"
+			],
+			[
+				"status",
+				"statusText"
+			],
+			[
+				"CURL",
+				"CURLOPT_RETURNTRANSFER"
+			],
+			[
+				"log",
+				"loginForm"
+			],
+			[
+				"sum",
+				"Submit"
+			],
+			[
+				"re",
+				"registerEvents"
+			],
+			[
+				"employ",
+				"employee-list"
+			],
+			[
+				"photo",
+				"photo"
+			],
+			[
+				"Cont",
+				"ContactField"
+			],
+			[
+				"e",
+				"employee"
+			],
+			[
+				"empl",
+				"employeeLiTpl"
+			],
+			[
+				"em",
+				"employee-list"
+			],
+			[
+				"search",
+				"search-key"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 306.0,
+		"selected_items":
+		[
+			[
+				"git commit ",
+				"Git: Commit"
+			],
+			[
+				"git status",
+				"Git: Status"
+			],
+			[
+				"git commit",
+				"Git: Commit"
+			],
+			[
+				"wor",
+				"Word Wrap: Toggle"
+			],
+			[
+				"file new",
+				"File: New View into File"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"in",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"inden",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"open https://github.com/userevents/demo-server/blob/master/src/demo_server/core.clj",
+			"open",
+			"https://github.com/userevents/demo-server/blob/master/src/demo_server/core.clj",
+			"ls",
+			"cd Packages/",
+			"import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/mmorgan/code/workshop/www/js/index.js",
+		"/home/mmorgan/code/workshop/www/index.html",
+		"/home/mmorgan/code/workshop/www/js/PushNotification.js",
+		"/home/mmorgan/code/workshop/www/css/styles.css",
+		"/home/mmorgan/code/workshop/www/js/LoginView.js",
+		"/home/mmorgan/code/workshop/www/js/HomeView.js",
+		"/home/mmorgan/code/workshop/www/config.xml",
+		"/home/mmorgan/code/workshop/www/js/storage/ls-store.js",
+		"/home/mmorgan/code/workshop/www/cordova.js",
+		"/home/mmorgan/code/workshop/www/js/old/main.js",
+		"/home/mmorgan/code/workshop/www/proxy.php",
+		"/home/mmorgan/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/mmorgan/code/demo-phonegap/www/js/main.js",
+		"/home/mmorgan/code/demo-phonegap/www/index.html",
+		"/home/mmorgan/code/demo-phonegap/www/css/index.css",
+		"/home/mmorgan/code/workshop/www/js/main.js",
+		"/home/mmorgan/code/workshop/www/js/EmployeeView.js",
+		"/home/mmorgan/code/endpoints/urban-airship-endpoint/config.znode",
+		"/home/mmorgan/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/mmorgan/homepage.html",
+		"/home/mmorgan/code/workshop/platforms/android/res/xml/config.xml",
+		"/home/mmorgan/code/workshop/platforms/android/AndroidManifest.xml",
+		"/home/mmorgan/code/workshop/www/js/storage/memory-store.js",
+		"/home/mmorgan/code/demo-phonegap/www/some.html",
+		"/home/mmorgan/code/demo-phonegap/www/js/index.js",
+		"/home/mmorgan/code/demo-phonegap/www/config.xml",
+		"/home/mmorgan/code/demo-phonegap/www/spec.html",
+		"/home/mmorgan/code/demo-phonegap/www/spec/index.js",
+		"/home/mmorgan/mmorgan/UserEvents VPN.conf",
+		"/home/mmorgan/.ssh/config",
+		"/home/mmorgan/.config/sublime-text-3/Packages/User/cordova.sublime-build",
+		"/home/mmorgan/code/hello/www/js/index.js",
+		"/home/mmorgan/code/hello/www/index.html"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"feature",
+			"dundermifflin",
+			"events/create",
+			"data",
+			"\",",
+			"src",
+			"app"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "/home/mmorgan/code/demo-phonegap"
+		},
+		{
+			"follow_symlinks": true,
+			"path": "/home/mmorgan/code"
+		}
+	],
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.git-commit":
+	{
+		"height": 112.0
+	},
+	"project": "",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 551.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

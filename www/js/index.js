@@ -6,8 +6,9 @@ var app = {
         this.detailsURL = /^#employees\/(\d{1,})/;
         this.bindEvents();
         console.log("back from bindEvents");
+        this.setupPush();
         this.loginPage = new LoginView().render();
-        app.slidePage(this.loginPage);
+        this.slidePage(this.loginPage);
     },
 
     bindEvents: function() {
@@ -116,19 +117,11 @@ var app = {
     },
 
     receivedEvent: function(id) {
-        var pushNotification = window.plugins.pushNotification;
-        if(device.platform == 'android' || device.platform == 'Android') {
-            pushNotification.register(this.successHandler, this.errorHandler, {"senderID": "390625689152", "ecb": "app.onNotificationGCM"});
-        } else {
-            pushNotification.register(this.tokenHandler, this.errorHandler, {"badge": "true", "sound": "true", "alert": "true", "ecb": "app.onNotificationAPN"});
-        }
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
-
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
-
         console.log('Received Event: ' + id);
     },
 
@@ -147,6 +140,32 @@ var app = {
                 self.slidePage(new EmployeeView(employee).render());
             });
         }
+    },
+
+    setupPush: function(){
+        var push = window.plugins.pushNotification;
+        push.registerEvent('registration', function(error, id) {
+            if(error) {
+                console.log("there was an error registering for push notifications");
+            } else {
+                console.log("Registered with ID: " + id);
+            }
+        });
+        push.registerEvent('push', function(push) {
+            console.log("Got push: " + push.message);
+        });
+        push.setTags(["loves_demos", "wants_to_be_pushed"], function() {
+            push.getTags(function(obj) {
+                obj.tags.forEach(function(tag) {
+                    console.log("Tag: " + tag);
+                });
+            });
+        });
+        push.isPushEnabled(function(enabled) {
+            if(enabled) {
+                console.log("Push is enabled! Fire away!");
+            }
+        });
     },
 
     sendEvent: function(type) {
@@ -181,7 +200,7 @@ var app = {
         }
     },
 
-    sliePage: function(page) {
+    slidePage: function(page) {
         console.log("entered slidePage function");
         var currentPageDest,
             self = this;
