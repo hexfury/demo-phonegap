@@ -6,19 +6,12 @@ var app = {
         this.detailsURL = /^#employees\/(\d{1,})/;
         this.bindEvents();
         console.log("back from bindEvents");
-        this.setupPush();
         this.loginPage = new LoginView().render();
         this.slidePage(this.loginPage);
     },
 
     bindEvents: function() {
         console.log("binding events");
-        if(navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
-            document.addEventListener('deviceready', app.onDeviceReady, false);
-            document.addEventListener('pause', app.onPause, false);
-        } else {
-            app.onDeviceReady();
-        }
         $('#loginForm').submit(function() {
             app.handleLogin();
             return false;
@@ -66,49 +59,33 @@ var app = {
     },
 
     onDeviceReady: function() {
-        console.log("entered deviceready");
-        app.receivedEvent('deviceready');
-    },
-
-    onNotificationAPN: function(event) {
-        var pushNotification = window.plugins.pushNotification;
-        console.log("Received a notification! " + event.alert);
-        console.log("event sound " + event.sound);
-        console.log("event badge " + event.badge);
-        console.log("event " + event);
-        if(event.alert) {
-            navigator.notification.alert(event.alert);
-        }
-        if(event.badge) {
-            console.log("Set badge on " + pushNotification);
-            pushNotification.setApplicationIconBadgeNumber(this.successHandler, event.badge);
-        }
-        if (event.sound) {
-            var snd = new Media(event.sound);
-            snd.play();
-        }
-    },
-
-    onNotificationGCM: function(event) {
-        switch(e.event) {
-            case 'registered':
-                if(e.regid.length > 0) {
-                    alert("registration id = " + e.regid);
-                }
-            break;
-
-            case 'message':
-                alert('message = ' + e.message + ' msgcnt = ' + e.msgcnt);
-            break;
-
-            case 'error':
-                alert('GCM error = ' + e.msg);
-            break
-
-            default:
-                alert('An unkown GCM event has occurred');
-            break;
-        }
+        var push = window.plugins.pushNotification;
+        var handleIncomingPush = function(incoming) {
+            if(incoming.message) {
+                console.log("Incoming push: " + incoming.message);
+            } else {
+                console.log("No incoming message");
+            }
+        };
+        var onRegistration = function(error, pushID) {
+            if (!error) {
+                console.log("Registration Success: " + pushID);
+                $('#id').text(pushID);
+            } else {
+                console.log(error);
+            }
+        };
+        var onPush = function(data) {
+            console.log("Received push: " + data.message);
+        };
+        push.registerEvent('registration', onRegistration);
+        push.registerEvent('push', onPush);
+        document.addEventListener("resume", function() {
+            push.resetBadge();
+            push.getIncoming(handleIncomingPush);
+        });
+        push.registerForNotificationTypes(push.notificationType.badge | push.notificationType.sound | push.notificationType.alert);
+        push.getIncoming(handleIncomingPush);
     },
 
     onPause: function () {
@@ -117,6 +94,7 @@ var app = {
     },
 
     receivedEvent: function(id) {
+        console.log('Received Event: ' + id);
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
@@ -142,47 +120,17 @@ var app = {
         }
     },
 
-    setupPush: function(){
-        var push = window.plugins.pushNotification;
-        push.registerEvent('registration', function(error, id) {
-            if(error) {
-                console.log("there was an error registering for push notifications");
-            } else {
-                console.log("Registered with ID: " + id);
-            }
-        });
-        push.registerEvent('push', function(push) {
-            console.log("Got push: " + push.message);
-        });
-        push.setTags(["loves_demos", "wants_to_be_pushed"], function() {
-            push.getTags(function(obj) {
-                obj.tags.forEach(function(tag) {
-                    console.log("Tag: " + tag);
-                });
-            });
-        });
-        push.isPushEnabled(function(enabled) {
-            if(enabled) {
-                console.log("Push is enabled! Fire away!");
-            }
-        });
-    },
-
     sendEvent: function(type) {
         var user = window.localStorage.getItem("user");
         var pass = window.localStorage.getItem("pass");
         var reqData = JSON.stringify({
-            "user": user,
+            "username": user,
             "pass": pass,
             "type": type,
             "origin": "demoApp"
         });
         console.log("data json string includes: " + reqData);
-        if(device.platform == 'android' || device.platform == 'Android') {
-            var dest = "http://ec2-50-19-162-216.compute-1.amazonaws.com:8086"
-        } else {
-            var dest = "/events/create"
-        }
+        var dest = "https://events.cxengage.net"
         $.ajax({ url: dest, data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function (res) {
             console.log("Status: " + res.status + ", " + res.statusText);
         }, fail: function (res) {

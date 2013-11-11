@@ -51,6 +51,7 @@ var app = {
         }, fail: function() {
             console.log("something didn't work");
         }});
+        return false;
     },
 
     onPause: function() {
@@ -69,6 +70,10 @@ var app = {
         console.log("back from registerEvents");
         this.loginPage = new LoginView().render();
         this.slidePage(this.loginPage);
+        $('#loginForm').submit(function() {
+            app.handleLogin();
+            return false;
+        });
     },
 
     registerEvents: function() {
@@ -155,10 +160,3 @@ var app = {
         });
     }
 };
-
-app.initialize();
-
-$('#loginForm').submit(function(e) {
-    app.handleLogin();
-    return false;
-});

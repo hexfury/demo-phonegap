@@ -3,7 +3,7 @@ var LoginView = function() {
 	this.initialize = function() {
 		console.log("entered LoginView.initialize function");
 		this.el = $('<div/>');
-		this.el.on('keyup', '.submit', this.handleLogin);
+		this.el.on('keyup', '.submit', app.handleLogin);
 	};
 
 	this.render = function() {
