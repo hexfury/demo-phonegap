@@ -1,3 +1,4 @@
+"use strict";
 var app = {
 
     initialize: function() {
@@ -12,11 +13,6 @@ var app = {
 
     bindEvents: function() {
         console.log("binding events");
-        $('#loginForm').submit(function(e) {
-            console.log("sending to handleLogin");
-            app.handleLogin();
-            return false;
-        })
         $(window).on('hashchange', $.proxy(this.route, this));
         if(document.documentElement.hasOwnProperty('ontouchstart')) {
             $('body').on('touchstart', 'a', function(event) {
@@ -48,7 +44,7 @@ var app = {
             console.log("sending event to amazon...");
             app.sendEvent("login");
             this.store = new LocalStorageStore(function() {
-                this.page = new HomeView(this.store).render().el;
+                this.page = new HomeView(app.store).render().el;
                 app.route(this.page);
             });
         } else {
