@@ -5,20 +5,22 @@
 	</head>
 	<body>
 		<script id="login-tpl" type="text/x-handlebars-template">
-			<div class='header'>
-				<h1>Demo Login</h1>
+			<div class="ui-bar ui-bar-b" data-role="header">
+				<center>
+					<img border="0" src="img/logo.png" alt="UserEvents" /><h1>Demo Login</h1>
+				</center>
 			</div>
 			<div class='content'>
-				<form id='loginForm' name="login" accept-charset="utf-8">
+				<form id='loginForm' name="login" accept-charset="utf-8"><center>
 					<div class='ui-hide-label'>
 						<label for="username">Username:</label>
-						<input type="text" name="username" id="username" value="" placeholder="Username">
+						<input type="text" name="username" id="username" value="1234" placeholder="Username">
 					</div>
 					<div class='ui-hide-label'>
 						<label for="password">Password:</label>
-						<input type="password" name="password" id="password" value="" placeholder="Password">
+						<input type="password" name="password" id="password" value="1234" placeholder="Password">
 					</div>
-					<input class='submit' type="submit" value="Login" id="submitButton">
+					<input class='submit' type="submit" id="submitButton"></center>
 				</form>
 			</div>
 			<div class='footer'><h4>&copy;UserEvents, Inc.</h4></div> 

@@ -1,3 +1,4 @@
+"use strict";
 var app = {
 
     initialize: function() {
@@ -6,17 +7,14 @@ var app = {
         this.detailsURL = /^#employees\/(\d{1,})/;
         this.bindEvents();
         console.log("back from bindEvents");
+        this.store = new LocalStorageStore();
         this.loginPage = new LoginView().render();
         this.slidePage(this.loginPage);
     },
 
     bindEvents: function() {
         console.log("binding events");
-        $('#loginForm').submit(function() {
-            app.handleLogin();
-            return false;
-        })
-        $(window).on('hashchange', $.proxy(this.route, this));
+        $(window).on('hashchange', $.proxy(app.route, this));
         if(document.documentElement.hasOwnProperty('ontouchstart')) {
             $('body').on('touchstart', 'a', function(event) {
                 $(event.target).addClass('tappable-active');
@@ -34,6 +32,51 @@ var app = {
         }
     },
 
+    getAuth: function(cid, cs) {
+        var bearer = "";
+        $.ajaxSetup({
+            headers: {
+                'Authorization': "Basic " + btoa(cid + ':' + cs)
+            }
+        });
+        var data = $.ajax({ 
+            url: "/1.0/token", 
+            data: "grant_type=client_credentials", 
+            type: "POST",
+            async: false, 
+            then: function(result){
+                console.log("Bearer: " + result.text + ", " + result.status + ", " + result.statusText);
+            }, 
+            fail: function(result) {
+                console.log("Bearer request failed...");
+            }
+        });
+        bearer = data.responseJSON.access_token;
+        return bearer;
+    },
+
+    getPushID: function() {
+        var push = window.plugins.pushNotification;
+        var id = null;
+        push.getPushID(function (id) {
+            if(id) {
+                console.log("Got push ID: " + id)
+                $('#id').text(id)
+                return id;
+            }
+        })
+        id = $('#id').val()
+        return id;
+    },
+
+    handleIncomingPush: function(incoming) {
+        if(incoming.message) {
+            console.log("Incoming push: " + incoming.message);
+        } else {
+            console.log("No incoming message");
+        };
+    },
+
     handleLogin: function() {
         console.log("entered handleLogin");
         var form = $("#loginForm");
@@ -41,56 +84,48 @@ var app = {
         var user = $("#username", form).val();
         var pass = $("#password", form).val();
         console.log("Username: " + user + ", Password: " + pass);
-        window.localStorage.setItem("user", user);
+        window.localStorage.setItem("user", user)
         window.localStorage.setItem("pass", pass);
-        if(user != '' && pass != '') {
+        if (user != '' && pass != '') {
             console.log("sending event to amazon...");
             app.sendEvent("login");
-            this.store = new LocalStorageStore(function() {
-                this.page = new HomeView(this.store).render().el;
-                app.route(this.page);
-            });
+            app.route(this.page);
         } else {
             console.log("Login Failed: - Send alert");
             app.showAlert("You must enter a username and password", "Failed Login");
             $("#submitButton").removeAttr("disabled");
-        }
+        };
         return false;
     },
 
     onDeviceReady: function() {
         var push = window.plugins.pushNotification;
-        var handleIncomingPush = function(incoming) {
-            if(incoming.message) {
-                console.log("Incoming push: " + incoming.message);
-            } else {
-                console.log("No incoming message");
-            }
-        };
-        var onRegistration = function(error, pushID) {
-            if (!error) {
-                console.log("Registration Success: " + pushID);
-                $('#id').text(pushID);
-            } else {
-                console.log(error);
-            }
-        };
-        var onPush = function(data) {
-            console.log("Received push: " + data.message);
-        };
-        push.registerEvent('registration', onRegistration);
-        push.registerEvent('push', onPush);
+        push.registerEvent('registration', app.onRegistration);
+        push.registerEvent('push', app.onPush);
         document.addEventListener("resume", function() {
             push.resetBadge();
-            push.getIncoming(handleIncomingPush);
+            push.getIncoming(app.handleIncomingPush);
         });
         push.registerForNotificationTypes(push.notificationType.badge | push.notificationType.sound | push.notificationType.alert);
-        push.getIncoming(handleIncomingPush);
+        push.getIncoming(app.handleIncomingPush);
+    },
+
+    onRegistration: function(error, pushID) {
+        if (!error) {
+            console.log("Registration Success: " + pushID);
+            $('#id').text(pushID);
+        } else {
+            console.log(error);
+        }
     },
 
     onPause: function () {
         console.log("entered onPause function");
         app.sendEvent("logout");
+    },
+
+    onPush: function(data) {
+        console.log("Received push: " + data.message);
     },
 
     receivedEvent: function(id) {
@@ -106,36 +141,52 @@ var app = {
     route: function() {
         console.log("entered route function");
         var hash = window.location.hash;
-        if(!hash) {
-            console.log("entered route, not hash");
-            this.homePage = new HomeView(this.store).render();
-            this.slidePage(this.homePage);
-            return;
-        }
         var match = hash.match(app.detailsURL);
         if (match) {
-            this.store.findById(Number(match[1]), function(employee) {
+            app.store.findById(Number(match[1]), function(employee) {
                 self.slidePage(new EmployeeView(employee).render());
             });
-        }
+            return;
+        };
+        if(!hash) {
+            console.log("entered route, not hash");
+            this.homePage = new HomeView(this).render();
+            this.slidePage(this.homePage);
+        };
     },
 
     sendEvent: function(type) {
         var user = window.localStorage.getItem("user");
         var pass = window.localStorage.getItem("pass");
+        var cid = "w2+cgjeZUEIOR114ATERnXb78qdPdV0UWb8avLdAfUkX";
+        var cs = "s8nWVjq6+bAYDZ87TyiwKIXIb3LIquNkZMm3NtXBZpAQ";
+        var id = app.getPushID();
         var reqData = JSON.stringify({
             "username": user,
             "pass": pass,
+            "id": id,
             "type": type,
+            "alert": "Open the app again!",
             "origin": "demoApp"
         });
         console.log("data json string includes: " + reqData);
-        var dest = "https://events.cxengage.net"
-        $.ajax({ url: dest, data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function (res) {
-            console.log("Status: " + res.status + ", " + res.statusText);
-        }, fail: function (res) {
-            console.log("something Bjork'ed");
-        }});        
+        $.ajaxSetup({
+            headers: {'Authorization': "Bearer " + app.getAuth(cid,cs)}
+        });
+        $.ajax({
+            url: "/1.0/tenants/qa/event",
+            data: reqData,
+            type: "POST",
+            async: false,
+            contentType: "application/json",
+            dataType: "json",
+            done: function(res) {
+                console.log("Status: " + res.status + ", " + res.statusText);
+            },
+            fail: function(res) {
+                console.log("Event Send Failed...");
+            }
+        });
         return false;
     },
 
@@ -151,7 +202,7 @@ var app = {
     slidePage: function(page) {
         console.log("entered slidePage function");
         var currentPageDest,
-            self = this;
+        self = this;
         if(!this.currentPage) {
             console.log("entered slidePage not currentPage");
             $(page.el).attr('class', 'page stage-center');

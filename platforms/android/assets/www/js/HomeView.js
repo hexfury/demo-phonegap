@@ -1,8 +1,7 @@
-var HomeView = function(store) {
-	
+var HomeView = function(obj) {
+
 	this.findByName = function() {
-		console.log("entered HomeView.findByName function");
-		store.findByName($('.search-key').val(), function(employees) {
+		obj.store.findByName($('.search-key').val(), function(employees) {
 			$('.employee-list').html(HomeView.liTemplate(employees));
 		});
 	};

@@ -1,8 +1,7 @@
-var HomeView = function(store) {
-	
+var HomeView = function(obj) {
+
 	this.findByName = function() {
-		console.log("entered HomeView.findByName function");
-		LocalStorageStore.findByName($('.search-key').val(), function(employees) {
+		obj.store.findByName($('.search-key').val(), function(employees) {
 			$('.employee-list').html(HomeView.liTemplate(employees));
 		});
 	};
@@ -10,10 +9,7 @@ var HomeView = function(store) {
 	this.initialize = function() {
 		console.log("entered HomeView.initialize function");
 		this.el = $('<div/>');
-		this.el.on('keyup', '.search-key', function(e) {
-			debugger;
-			HomeView.findByName();
-		});
+		this.el.on('keyup', '.search-key', this.findByName);
 	};
 
 	this.render = function() {
@@ -21,8 +17,7 @@ var HomeView = function(store) {
 		this.el.html(HomeView.template());
 		return this;
 	};
-	this.store = store;
-	debugger;
+
 	this.initialize();
 }
 
