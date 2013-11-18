@@ -60,7 +60,6 @@ var app = {
                     dataType: "json"
                 });
                 sendEvent.done(app.showAlert("Event Sent Successfully!", "Hurray!"));
-                sendEvent.fail(app.showAlert("Event send failed... Are you connected to the internet?", "boo!"));
             }, function fail () {
                 app.showAlert("Failed to get push ID", "boo!");
             });
@@ -158,21 +157,11 @@ var app = {
 
     onPause: function () {
         console.log("entered onPause function");
-        app.sendEvent("logout");
+        app.eventChain("logout");
     },
 
     onPush: function(data) {
         console.log("Received push: " + data.message);
-    },
-
-    receivedEvent: function(id) {
-        console.log('Received Event: ' + id);
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-        console.log('Received Event: ' + id);
     },
 
     route: function() {
