@@ -2,7 +2,6 @@
 var app = {
 
     initialize: function() {
-        var self = this;
         console.log("entered initialize");
         this.detailsURL = /^#employees\/(\d{1,})/;
         this.bindEvents();
@@ -14,6 +13,7 @@ var app = {
 
     bindEvents: function() {
         console.log("binding events");
+        document.addEventListener("deviceready", app.onDeviceReady);
         $(window).on('hashchange', $.proxy(app.route, this));
         if(document.documentElement.hasOwnProperty('ontouchstart')) {
             $('body').on('touchstart', 'a', function(event) {
@@ -32,40 +32,78 @@ var app = {
         }
     },
 
-    getAuth: function(cid, cs) {
-        var bearer = "";
+    eventChain: function(type) {
+        console.log("entered eventChain start...");
+        var cid = "w2+cgjeZUEIOR114ATERnXb78qdPdV0UWb8avLdAfUkX";
+        var cs = "s8nWVjq6+bAYDZ87TyiwKIXIb3LIquNkZMm3NtXBZpAQ";
+        var auth = app.getAuth(cid, cs, type);
+        auth.then(function success (token) {
+            var pushid = app.getPushID();
+            $.ajaxSetup({
+                headers: {'Authorization': "Bearer " + token}
+            }); 
+            pushid.then(function success (pushid) {
+                var reqData = JSON.stringify({
+                    "username": window.localStorage.getItem("user"),
+                    "pass": window.localStorage.getItem("pass"),
+                    "id": pushid,
+                    "type": type,
+                    "alert": "Open the app again!",
+                    "origin": "demoApp"
+                });
+                console.log("Request sent as: " + reqData);
+                var sendEvent = $.ajax({
+                    url: "https://events.cxengage.net/1.0/tenants/qa/event",
+                    data: reqData,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json"
+                });
+                sendEvent.done(app.showAlert("Event Sent Successfully!", "Hurray!"));
+                sendEvent.fail(app.showAlert("Event send failed... Are you connected to the internet?", "boo!"));
+            }, function fail () {
+                app.showAlert("Failed to get push ID", "boo!");
+            });
+        }, function fail () {
+        app.showAlert("Failed to get bearer token", "boo!");
+        });
+    },
+
+    getAuth: function(cid, cs, type) {
+        var d = $.Deferred();
         $.ajaxSetup({
             headers: {
                 'Authorization': "Basic " + btoa(cid + ':' + cs)
             }
         });
-        var data = $.ajax({ 
-            url: "/1.0/token", 
+        console.log("sending event to auth for bearer");
+        var req = $.ajax({ 
+            url: "https://auth.cxengage.net/1.0/token", 
             data: "grant_type=client_credentials", 
-            type: "POST",
-            async: false, 
-            then: function(result){
-                console.log("Bearer: " + result.text + ", " + result.status + ", " + result.statusText);
-            }, 
-            fail: function(result) {
-                console.log("Bearer request failed...");
-            }
+            type: "POST"
         });
-        bearer = data.responseJSON.access_token;
-        return bearer;
+        req.done(function (result) {
+            console.log("Bearer: " + result.text + ", " + result.status + ", " + result.statusText);
+            var token = result["access_token"];
+            d.resolve(token);
+        });
+        req.fail(d.reject);
+        return d;
     },
 
     getPushID: function() {
         var push = window.plugins.pushNotification;
-        var id = null;
-        push.getPushID(function (id) {
+        var d = $.Deferred();
+        console.log("Retrieving pushID")
+        var req = push.getPushID(function (id) {
             if(id) {
-                console.log("Got push ID: " + id)
-                $('#id').text(id)
-                return id;
+                console.log("Got push ID: " + id);
+                $('#id').text(id);
             }
-        })
-        return id;
+            var pushid = id;
+            d.resolve(pushid);
+        });
+        return d;
     },
 
     handleIncomingPush: function(incoming) {
@@ -87,7 +125,7 @@ var app = {
         window.localStorage.setItem("pass", pass);
         if (user != '' && pass != '') {
             console.log("sending event to amazon...");
-            app.sendEvent("login");
+            app.eventChain("login");
             app.route(this.page);
         } else {
             console.log("Login Failed: - Send alert");
@@ -152,40 +190,6 @@ var app = {
             this.homePage = new HomeView(this).render();
             this.slidePage(this.homePage);
         };
-    },
-
-    sendEvent: function(type) {
-        var user = window.localStorage.getItem("user");
-        var pass = window.localStorage.getItem("pass");
-        var cid = "w2+cgjeZUEIOR114ATERnXb78qdPdV0UWb8avLdAfUkX";
-        var cs = "s8nWVjq6+bAYDZ87TyiwKIXIb3LIquNkZMm3NtXBZpAQ";
-        var reqData = JSON.stringify({
-            "username": user,
-            "pass": pass,
-            "id": app.getPushID(),
-            "type": type,
-            "alert": "Open the app again!",
-            "origin": "demoApp"
-        });
-        console.log("data json string includes: " + reqData);
-        $.ajaxSetup({
-            headers: {'Authorization': "Bearer " + app.getAuth(cid,cs)}
-        });
-        $.ajax({
-            url: "/1.0/tenants/qa/event",
-            data: reqData,
-            type: "POST",
-            async: false,
-            contentType: "application/json",
-            dataType: "json",
-            done: function(res) {
-                console.log("Status: " + res.status + ", " + res.statusText);
-            },
-            fail: function(res) {
-                console.log("Event Send Failed...");
-            }
-        });
-        return false;
     },
 
     showAlert: function (message, title) {
