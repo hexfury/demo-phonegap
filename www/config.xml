@@ -1,5 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
-<widget id="com.userevents.demo-phonegap" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns     = "http://www.w3.org/ns/widgets"
+        xmlns:gap = "http://phonegap.com/ns/1.0"
+        id        = "org.coenraets.employeedirectory"
+        versionCode="10"
+        version   = "1.1.0">
+
     <name>UserEvents Demo App</name>
     <description>
         A simple application to demo event processing with CxEngage.
@@ -20,4 +25,9 @@
     <preference name="com.urbanairship.development_app_secret" value="8T4y4pIxTXaufcvPf5_5Xg" />
     <preference name="com.urbanairship.in_production" value="False" />
     <preference name="com.urbanairship.gcm_sender" value="390625689152" />
+    <plugin name="Camera" value="org.apache.cordova.CameraLauncher" />
+    <plugin name="Contacts" value="org.apache.cordova.ContactManager" />
+    <plugin name="Geolocation" value="org.apache.cordova.GeoBroker" />
+    <plugin name="Notification" value="org.apache.cordova.Notification"/>
+    <plugin name="Battery" value="org.apache.cordova.BatteryListener" />
 </widget>

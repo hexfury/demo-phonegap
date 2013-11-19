@@ -1,77 +1,69 @@
 <html>
-	<head>
-		<script src="css/source-sans-pro.js"></script>
-		<link href="css/styles.css" rel="stylesheet"/>
-	</head>
-	<body>
-		<script id="login-tpl" type="text/x-handlebars-template">
-			<div class="ui-bar ui-bar-b" data-role="header">
-				<center>
-					<img border="0" src="img/logo.png" alt="UserEvents" /><h1>Demo Login</h1>
-				</center>
-			</div>
-			<div class='content'>
-				<form id='loginForm' name="login" accept-charset="utf-8"><center>
-					<div class='ui-hide-label'>
-						<label for="username">Username:</label>
-						<input type="text" name="username" id="username" value="1234" placeholder="Username">
-					</div>
-					<div class='ui-hide-label'>
-						<label for="password">Password:</label>
-						<input type="password" name="password" id="password" value="1234" placeholder="Password">
-					</div>
-					<input class='submit' type="submit" id="submitButton"></center>
-				</form>
-			</div>
-			<div class='footer'><h4>&copy;UserEvents, Inc.</h4></div> 
-		</script>
-		<script id="home-tpl" type="text/x-handlebars-template">
-			<div class='header'><h1>Home</h1></div>
-			<div class='search-bar'><input class='search-key' type="search" placeholder="Search"/></div>
-			<div class='scroll'><ul class='employee-list'></ul>
-			<div class='push'></div></div>
-			<div class='footer'><h4>&copy;UserEvents, Inc.</h4></div>	 
-		</script>
-		<script id="employee-li-tpl" type="text/x-handlebars-template">
-			{{#.}}
-			<li><a href="#employees/{{this.id}}">{{this.firstName}} {{this.lastName}}<br/>
-				{{this.title}}</a></li>
-			{{/.}}
-		</script>
-		<script id="employee-tpl" type="text/x-handlebars-template">
-			<div class='header'>
-				<a href="#" class="button header-button header-button-left">Back</a>
-				<h1>Details</h1>
-			</div>
-			<div class='details'>
-				<img class='employee-image' src='img/{{firstName}}_{{lastName}}.jpg' />
-				<h1>{{firstName}} {{lastName}}</h1>
-				<h2>{{title}}</h2>
-				<h2>{{comment}}</h2>
-				<span class="location"></span>
-				<ul>
-					<li><a href="tel:{{officePhone}}">Call Office<br/>{{officePhone}}</a></li>
-					<li><a href="tel:{{cellPhone}}">Call Cell<br/>{{cellPhone}}</a></li>
-					<li><a href="sms:{{cellPhone}}">SMS<br/>{{cellPhone}}</a></li>
-					<li><a href="#" class="add-location-btn">Add Location</a></li>
-					<li><a href="#" class="add-contact-btn">Add to Contacts</a></li>
-					<li><a href="#" class="change-pic-btn">Change Picture</a></li>
-				</ul>
-			</div>
-			<div class='footer'><h4>&copy;UserEvents, Inc.</h4></div> 
-		</script>
-		<script type="text/javascript" src="cordova.js"></script>
-		<script type="text/javascript" src="lib/PushNotification.js"></script>
-		<script type="text/javascript" src="lib/jquery.js"></script>
-		<script type="text/javascript" src="lib/jquery.mobile.js"></script>
-		<script type="text/javascript" src="lib/handlebars.js"></script>
-		<script type="text/javascript" src="js/storage/ls-store.js"></script>
-		<script type="text/javascript" src="js/LoginView.js"></script>
-		<script type="text/javascript" src="js/HomeView.js"></script>
-		<script type="text/javascript" src="js/EmployeeView.js"></script>
-		<script type="text/javascript" src="js/index.js"></script>
-		<script type="text/javascript">
-			app.initialize();
-		</script>
-	</body>
+    <head>
+        <script src="css/source-sans-pro.js"></script>
+        <link href="css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <script id="login-tpl" type="text/x-handlebars-template">
+            <div class="ui-bar ui-bar-b" data-role="header">
+                <center>
+                    <img border="0" src="img/logo.png" alt="UserEvents" /><h1>Demo Login</h1>
+                </center>
+            </div>
+            <div class='content'>
+                <form id='loginForm' name="login" accept-charset="utf-8"><center>
+                    <div class='ui-hide-label'>
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" id="username" value="1234" placeholder="Username">
+                    </div>
+                    <div class='ui-hide-label'>
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" id="password" value="1234" placeholder="Password">
+                    </div>
+                    <input class='submit' type="submit" id="submitButton"></center>
+                </form>
+            </div>
+            <div class='footer'><center><h4>&copy;UserEvents, Inc.</h4></center></div> 
+        </script>
+        <script id="home-tpl" type="text/x-handlebars-template">
+            <div class='header'><h1>Home</h1></div>
+            <div class='search-bar'><input class='search-key' type="search" placeholder="Search"/></div>
+            <div class="scroll"><ul class='employee-list'></ul>
+            <div class='push'></div></div>
+            <div class='footer'><center><h4><a onClick="javascript:localStorage.clear();">&copy;UserEvents, Inc.</a></h4></center></div>   
+        </script>
+        <script id="employee-li-tpl" type="text/x-handlebars-template">
+            {{#.}}
+            <li><a href="#employees/{{this.id}}">{{this.firstName}} {{this.lastName}}<br/>{{this.title}}</a></li>
+            {{/.}}
+        </script>
+        <script id="employee-tpl" type="text/x-handlebars-template">
+            <div class='header'><a href='#' class="button header-button header-button-left">Back</a><h1>Details</h1></div>
+            <div class='details'>
+                <img id='image' src='img/{{firstName}}_{{lastName}}.jpg' style="float:left;margin:10px;"/>
+                <h1>{{firstName}} {{lastName}}</h1>
+                <h2>{{title}}</h2>
+                <h2>{{comment}}</h2>
+                <span class="location"></span>
+                <ul>
+                    <li><a href="tel:{{officePhone}}">Call Office<br/>{{officePhone}}</a></li>
+                    <li><a href="tel:{{cellPhone}}">Call Cell<br/>{{cellPhone}}</a></li>
+                    <li><a href="sms:{{cellPhone}}">SMS<br/>{{cellPhone}}</a></li>
+                    <li><a href="#" class="add-location-btn">Add Location</a></li>
+                    <li><a href="#" class="add-contact-btn">Add to Contacts</a></li>
+                    <li><a href="#" class="change-pic-btn">Change Picture</a></li>
+                </ul>
+            </div>
+            <div class='footer'><center><h4>&copy;UserEvents, Inc.</h4></center></div>   
+        </script>
+        <script src="cordova.js"></script>
+        <script src="lib/jquery.js"></script>
+        <script src="lib/handlebars.js"></script>
+        <script src="lib/PushNotification.js"></script>
+        <script src="js/storage/ls-store.js"></script>
+        <script src="js/HomeView.js"></script>
+        <script src="js/EmployeeView.js"></script>
+        <script src="js/LoginView.js"></script>
+        <script src="js/main.js"></script>
+    </body>
 </html>

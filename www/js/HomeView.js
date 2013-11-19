@@ -1,24 +1,24 @@
-var HomeView = function(obj) {
+var HomeView = function(store) {
 
-	this.findByName = function() {
-		obj.store.findByName($('.search-key').val(), function(employees) {
-			$('.employee-list').html(HomeView.liTemplate(employees));
-		});
-	};
+    this.initialize = function() {
+        // Define a div wrapper for the view. The div wrapper is used to attach events.
+        this.el = $('<div/>');
+        this.el.on('keyup', '.search-key', this.findByName);
+    };
 
-	this.initialize = function() {
-		console.log("entered HomeView.initialize function");
-		this.el = $('<div/>');
-		this.el.on('keyup', '.search-key', this.findByName);
-	};
+    this.render = function() {
+        this.el.html(HomeView.template());
+        return this;
+    };
 
-	this.render = function() {
-		console.log("entered HomeView.render function");
-		this.el.html(HomeView.template());
-		return this;
-	};
+    this.findByName = function() {
+        store.findByName($('.search-key').val(), function(employees) {
+            $('.employee-list').html(HomeView.liTemplate(employees));
+        });
+    };
 
-	this.initialize();
+    this.initialize();
+
 }
 
 HomeView.template = Handlebars.compile($("#home-tpl").html());

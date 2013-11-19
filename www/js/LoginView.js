@@ -1,4 +1,4 @@
-var LoginView = function() {
+var LoginView = function () {
 
 	this.initialize = function() {
 		console.log("entered LoginView.initialize function");

@@ -1,121 +1,167 @@
 var app = {
 
+    eventChain: function(type) {
+        console.log("entered eventChain start...");
+        var cid = "w2+cgjeZUEIOR114ATERnXb78qdPdV0UWb8avLdAfUkX";
+        var cs = "s8nWVjq6+bAYDZ87TyiwKIXIb3LIquNkZMm3NtXBZpAQ";
+        var auth = app.getAuth(cid, cs, type);
+        auth.then(function success (token) {
+            var pushid = app.getPushID();
+            $.ajaxSetup({
+                headers: {'Authorization': "Bearer " + token}
+            }); 
+            pushid.then(function success (pushid) {
+                var reqData = JSON.stringify({
+                    "username": window.localStorage.getItem("user"),
+                    "pass": window.localStorage.getItem("pass"),
+                    "id": pushid,
+                    "type": type,
+                    "alert": "Open the app again!",
+                    "origin": "demoApp"
+                });
+                console.log("Request sent as: " + reqData);
+                var sendEvent = $.ajax({
+                    url: "https://events.cxengage.net/1.0/tenants/qa/event",
+                    data: reqData,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json"
+                });
+                sendEvent.done(app.showAlert("Event Sent Successfully!", "Hurray!"));
+            }, function fail () {
+                app.showAlert("Failed to get push ID", "boo!");
+            });
+        }, function fail () {
+            app.showAlert("Failed to get bearer token", "boo!");
+        });
+    },
+
+    getAuth: function(cid, cs, type) {
+        var d = $.Deferred();
+        $.ajaxSetup({
+            headers: {
+                'Authorization': "Basic " + btoa(cid + ':' + cs)
+            }
+        });
+        console.log("sending event to auth for bearer");
+        var req = $.ajax({ 
+            url: "https://auth.cxengage.net/1.0/token", 
+            data: "grant_type=client_credentials", 
+            type: "POST"
+        });
+        req.done(function (result) {
+            console.log("Bearer: " + result["access_token"]);
+            var token = result["access_token"];
+            d.resolve(token);
+        });
+        req.fail(d.reject);
+        return d;
+    },
+
+    getPushID: function() {
+        var push = window.plugins.pushNotification;
+        var d = $.Deferred();
+        console.log("Retrieving pushID")
+        var req = push.getPushID(function (id) {
+            if(id) {
+                console.log("Got push ID: " + id);
+                $('#id').text(id);
+            }
+            var pushid = id;
+            d.resolve(pushid);
+        });
+        return d;
+    },
+
+    handleIncomingPush: function(incoming) {
+        if(incoming.message) {
+            console.log("Incoming push: " + incoming.message);
+        } else {
+            console.log("No incoming message");
+        };
+    },
+
     handleLogin: function() {
         console.log("entered handleLogin");
         var form = $("#loginForm");
         $("#submitButton", form).attr("disabled", "disabled");
         var user = $("#username", form).val();
-        var pass = $("#password", form).val();
-        console.log("username: " + user);
-        console.log("password: " + pass);
-        console.log("Login Attempt - Submit Clicked");
+        var pass = $("#username", form).val();
+        console.log("Username: " + user + ", Password: " + pass);
         window.localStorage.setItem("user", user);
         window.localStorage.setItem("pass", pass);
-        if(user != '' && pass != '') {
-            console.log("attempting post to amazonaws");
-            app.sendEvent("login");
-            console.log("ajax fired...")
-            this.store = new LocalStorageStore(function() {
-            this.page = new HomeView(this.store).render().el;
-            app.route(this.page);
-            });
+        if (user != null && pass != null) {
+            console.log("send an event to rest");
+            app.eventChain("login");
+            app.route();
         } else {
-            console.log("sending to showAlert for failed login");
+            console.log("Login Failed: - Send alert");
             app.showAlert("You must enter a username and password", "Failed Login");
             $("#submitButton").removeAttr("disabled");
-        }
+        };
         return false;
     },
 
-    sendEvent: function(type) {
-        var user = window.localStorage.getItem("user");
-        var pass = window.localStorage.getItem("pass");
-        var reqData = JSON.stringify({
-            "user": user,
-            "type": type,
-            "pass": pass,
-            "origin": "demoApp"
+    onDeviceReady: function() {
+        var push = window.plugins.pushNotification;
+        push.registerEvent('registration', app.onRegistration);
+        push.registerEvent('push', app.onPush);
+        document.addEventListener("resume", function() {
+            push.resetBadge();
+            push.getIncoming(app.handleIncomingPush);
         });
-        console.log("data json string includes: " + reqData);
-        var reqest = $.ajax({ url: "http://ec2-50-19-162-216.compute-1.amazonaws.com:8086/events/create", data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function(res) {
-            console.log(res.status);
-            console.log(res.statusText);
-            console.log(res.responseText);
-        }, fail: function() {
-            console.log("something didn't work");
-        }});
-        var reqest2 = $.ajax({ url: "/events/create", data: reqData, type: "POST", contentType: "application/json", dataType: "json", done: function(res) {
-            console.log(res.status);
-            console.log(res.statusText);
-            console.log(res.responseText);
-        }, fail: function() {
-            console.log("something didn't work");
-        }});
-        return false;
+        push.registerForNotificationTypes(push.notificationType.badge | push.notificationType.sound | push.notificationType.alert);
+        push.getIncoming(app.handleIncomingPush);
     },
 
-    onPause: function() {
+    onPause: function () {
         console.log("entered onPause function");
-        var user = window.localStorage.getItem("user");
-        var pass = window.localStorage.getItem("pass");
-        app.sendEvent("logout");
+        //app.eventChain("logout");
+        window.localStorage.clear();
     },
 
-    initialize: function() {
-        console.log("entered initialize function");
-        var self = this;
-        this.detailsURL = /^#employees\/(\d{1,})/;
-        console.log("goto registerEvents");
-        this.registerEvents();
-        console.log("back from registerEvents");
-        this.loginPage = new LoginView().render();
-        this.slidePage(this.loginPage);
-        $('#loginForm').submit(function() {
-            app.handleLogin();
-            return false;
-        });
+    onRegistration: function(error, pushID) {
+        if (!error) {
+            console.log("Registration Success: " + pushID);
+            $('#id').text(pushID);
+        } else {
+            console.log(error);
+        }
     },
 
     registerEvents: function() {
-        console.log("entered registerEvents function");
-        var self = this;
         $(window).on('hashchange', $.proxy(this.route, this));
         document.addEventListener("pause", app.onPause, false);
-        if (document.documentElement.hasOwnProperty('ontouchstart')) {
-            $('body').on('touchstart', 'a', function(event) {
-                $(event.target).addClass('tappable-active');
-            });
-            $('body').on('touchend', 'a', function(event) {
-                $(event.target).removeClass('tappable-active');
-            });
-        } else {
-            $('body').on('mousedown', 'a', function(event) {
-                $(event.target).addClass('tappable-active');
-            });
-            $('body').on('mouseup', 'a', function(event) {
-                $(event.target).removeClass('tappable-active');
-            });
-        }
+        $('body').on('mousedown', 'a', function(event) {
+            $(event.target).addClass('tappable-active');
+        });
+        $('body').on('mouseup', 'a', function(event) {
+            $(event.target).removeClass('tappable-active');
+        });
     },
 
     route: function() {
-        console.log("entered route function");
         var self = this;
         var hash = window.location.hash;
         if (!hash) {
-            console.log("entered route, not hash");
-            if (this.loginPage) {
-                console.log("entered this.loginPage");
-                this.homePage = new HomeView(this.store).render();
-                this.slidePage(this.homePage);
+            if (window.localStorage.getItem("user") == null) {
+                if (this.loginPage) {
+                    this.slidePage(this.loginPage);
+                } else {
+                    this.loginPage = new LoginView().render();
+                    this.slidePage(this.loginPage);
+                }
             } else {
-                console.log("entered not this.loginpage");
-                this.homePage = new HomeView(this.store).render();
-                this.slidePage(this.homePage);
+                if (this.homePage) {
+                    this.slidePage(this.homePage);
+                } else {
+                    this.homePage = new HomeView(this.store).render();
+                    this.slidePage(this.homePage);
+                }
             }
             return;
         }
-        var match = hash.match(app.detailsURL);
+        var match = hash.match(this.detailsURL);
         if (match) {
             this.store.findById(Number(match[1]), function(employee) {
                 self.slidePage(new EmployeeView(employee).render());
@@ -123,8 +169,7 @@ var app = {
         }
     },
 
-    showAlert: function(message, title) {
-        console.log("entered showAlert function");
+    showAlert: function (message, title) {
         if (navigator.notification) {
             navigator.notification.alert(message, null, title, 'OK');
         } else {
@@ -132,12 +177,10 @@ var app = {
         }
     },
 
-    slidePage: function (page) {
-        console.log("entered slidePage function");
+    slidePage: function(page) {
         var currentPageDest,
-            self = this;
+        self = this;
         if (!this.currentPage) {
-            console.log("entered slidePage not currentPage");
             $(page.el).attr('class', 'page stage-center');
             $('body').append(page.el);
             this.currentPage = page;
@@ -145,7 +188,6 @@ var app = {
         }
         $('.stage-right, .stage-left').not('.homePage').remove();
         if (page === app.homePage) {
-            console.log("entered slidePage ");
             $(page.el).attr('class', 'page stage-left');
             currentPageDest = "stage-right";
         } else {
@@ -158,5 +200,16 @@ var app = {
             $(page.el).attr('class', 'page stage-center transition');
             self.currentPage = page;
         });
+    },
+
+    initialize: function() {
+        window.localStorage.clear();
+        var self = this;
+        this.detailsURL = /^#employees\/(\d{1,})/;
+        this.registerEvents();
+        this.store = new LocalStorageStore(function () {
+            self.route();
+        });
     }
 };
+app.initialize();
